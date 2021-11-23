@@ -1,6 +1,8 @@
 # vectofil+
 A program to perform Basic Vector Directional Filtering for the noisy color images. This a project of Computer Vision and Image Processing course in West Pomeranian University of Technology.
 
+For the demostration, check out Results directory, or [see the GUI on YouTube](https://www.youtube.com/watch?v=pXBCrB0VlLY).
+
 ### What we will add?
 - Save the output functionality.
 - Save the process as a PDF and PNGs functionality
