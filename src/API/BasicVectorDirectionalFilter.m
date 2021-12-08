@@ -1,4 +1,4 @@
-function filtered_image = bvdf_filter(image, sample_dims)
+function filtered_image = BasicVectorDirectionalFilter(image, sample_dims)
 % BVDF_FILTER Function to filter the image according the BVDF rule.
     if nargin < 2
         error("You have to give the image as uint8 matrix, and dimensions of the vectoral process.");
@@ -21,7 +21,7 @@ function filtered_image = bvdf_filter(image, sample_dims)
             area2filter = im2double(area2filter).*255;
             
             vectors_list = reshape(area2filter , [], 3)';
-            sorted_vectors = bvdf_sort_vectors(vectors_list);
+            sorted_vectors = SortVectorsbyAngle(vectors_list);
             filtered_image(x_index, y_index, :) = sorted_vectors(:, 1);
         end
     end

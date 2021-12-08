@@ -1,5 +1,5 @@
-function bvdf_plot_vectors(vectors, origin, ColorScheme)
-% BVDF_PLOT_VECTORS The function plots the 3D vectors in space.
+function 3DVectorPlot(vectors, origin, ColorScheme)
+% 3DVectorPlot The function plots the 3D vectors in space.
 % Only and first parameter is the matrix which every column is a vector.
     
     % Control if the optional arguments are given.

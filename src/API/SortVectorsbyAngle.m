@@ -1,4 +1,4 @@
-function [sorted_vectors, sorted_angles] = bvdf_sort_vectors(vectors)
+function [sorted_vectors, sorted_angles] = SortVectorsbyAngle(vectors)
 % BVDF_VECTOR_SORT A function to sort the given n-dimensional vectors.
 % Parameter vectors has to be a matrix which every column represents a
 % vector. Function returns a vector, first element is the sorted vectors'

@@ -1,4 +1,4 @@
-function noisy_img = bvdf_add_noise(image, perc, channel_size, assigned)
+function noisy_img = AddPseudoNoise(image, perc, channel_size, assigned)
     noisy_img = image;
     
     % Travel throught every pixel.
