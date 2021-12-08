@@ -2,11 +2,10 @@ classdef vectofil_plus < matlab.apps.AppBase
 
     % Properties that correspond to app components
     properties (Access = public)
-        UIFigure                   matlab.ui.Figure
+        VectofilUIFigure           matlab.ui.Figure
         GridLayout                 matlab.ui.container.GridLayout
         LeftPanel                  matlab.ui.container.Panel
-        MadeforComputerVisionandImageProcessingcourseinZUTLabel_5  matlab.ui.control.Label
-        MadeforComputerVisionandImageProcessingcourseinZUTLabel_4  matlab.ui.control.Label
+        MadeforComputerVisionandImageProcessingcourseinZUTLabel_6  matlab.ui.control.Label
         MadeforComputerVisionandImageProcessingcourseinZUTLabel_3  matlab.ui.control.Label
         MadeforComputerVisionandImageProcessingcourseinZUTLabel_2  matlab.ui.control.Label
         InputImageCanvas           matlab.ui.control.Image
@@ -101,7 +100,22 @@ classdef vectofil_plus < matlab.apps.AppBase
                     % Check condition if its in interval for assign noise.
                     if (min((interval(:, 1) < reshaped_area)) && ...
                         min(reshaped_area < interval(:, 2)))
-                        app.NoisyImage(index, jndex, :) = app.NoiseColour;
+                        
+                        CurrentNoiseColour = app.NoiseColour;
+                        % Checking for [-1, 0) interval in the RGB color
+                        % spinner. If a negative value given, it means that
+                        % we want it to be random.
+                        if app.NoiseColour(1) < 0
+                            CurrentNoiseColour(1) = randi([0, 255], [1, 1]);
+                        end
+                        if app.NoiseColour(2) < 0
+                            CurrentNoiseColour(2) = randi([0, 255], [1, 1]);
+                        end
+                        if app.NoiseColour(3) < 0
+                            CurrentNoiseColour(3) = randi([0, 255], [1, 1]);
+                        end
+                        
+                        app.NoisyImage(index, jndex, :) = CurrentNoiseColour;
                     end
                 end
             end
@@ -343,7 +357,7 @@ classdef vectofil_plus < matlab.apps.AppBase
 
         % Code that executes after component creation
         function startupFcn(app)
-            app.UIFigure.Name = 'Vectofil+';
+            app.VectofilUIFigure.Name = 'Vectofil+';
             
             app.ColorShowLamp.Color = app.NoiseColour./255;
             app.RedSpinner.Value = app.NoiseColour(1);
@@ -354,7 +368,7 @@ classdef vectofil_plus < matlab.apps.AppBase
 
         % Changes arrangement of the app based on UIFigure width
         function updateAppLayout(app, event)
-            currentFigureWidth = app.UIFigure.Position(3);
+            currentFigureWidth = app.VectofilUIFigure.Position(3);
             if(currentFigureWidth <= app.onePanelWidth)
                 % Change to a 3x1 grid
                 app.GridLayout.RowHeight = {549, 549, 549};
@@ -468,21 +482,36 @@ classdef vectofil_plus < matlab.apps.AppBase
         function RedSpinnerValueChanging(app, event)
             changingValue = event.Value;
             app.NoiseColour = [changingValue, app.NoiseColour(2), app.NoiseColour(3)];
-            app.ColorShowLamp.Color = app.NoiseColour./255;
+            
+            if min(app.NoiseColour) < 0
+                app.ColorShowLamp.Enable = "off";
+            else
+                app.ColorShowLamp.Color = app.NoiseColour./255;
+            end
         end
 
         % Value changing function: GreenSpinner
         function GreenSpinnerValueChanging(app, event)
             changingValue = event.Value;
             app.NoiseColour = [app.NoiseColour(1), changingValue, app.NoiseColour(3)];
-            app.ColorShowLamp.Color = app.NoiseColour./255;
+            
+            if min(app.NoiseColour) < 0
+                app.ColorShowLamp.Enable = "off";
+            else
+                app.ColorShowLamp.Color = app.NoiseColour./255;
+            end
         end
 
         % Value changing function: BlueSpinner
         function BlueSpinnerValueChanging(app, event)
             changingValue = event.Value;
             app.NoiseColour = [app.NoiseColour(1), app.NoiseColour(2), changingValue];
-            app.ColorShowLamp.Color = app.NoiseColour./255;
+            
+            if min(app.NoiseColour) < 0
+                app.ColorShowLamp.Enable = "off";
+            else
+                app.ColorShowLamp.Color = app.NoiseColour./255;
+            end
         end
 
         % Value changing function: NoisePercentageSlider
@@ -579,16 +608,17 @@ classdef vectofil_plus < matlab.apps.AppBase
         % Create UIFigure and components
         function createComponents(app)
 
-            % Create UIFigure and hide until all components are created
-            app.UIFigure = uifigure('Visible', 'off');
-            app.UIFigure.AutoResizeChildren = 'off';
-            app.UIFigure.Position = [100 100 1348 549];
-            app.UIFigure.Name = 'MATLAB App';
-            app.UIFigure.Resize = 'off';
-            app.UIFigure.SizeChangedFcn = createCallbackFcn(app, @updateAppLayout, true);
+            % Create VectofilUIFigure and hide until all components are created
+            app.VectofilUIFigure = uifigure('Visible', 'off');
+            app.VectofilUIFigure.AutoResizeChildren = 'off';
+            app.VectofilUIFigure.Position = [100 100 1348 549];
+            app.VectofilUIFigure.Name = 'Vectofil+';
+            app.VectofilUIFigure.Resize = 'off';
+            app.VectofilUIFigure.SizeChangedFcn = createCallbackFcn(app, @updateAppLayout, true);
+            app.VectofilUIFigure.Tag = 'version Jeden';
 
             % Create GridLayout
-            app.GridLayout = uigridlayout(app.UIFigure);
+            app.GridLayout = uigridlayout(app.VectofilUIFigure);
             app.GridLayout.ColumnWidth = {335, '1x', 677};
             app.GridLayout.RowHeight = {'1x'};
             app.GridLayout.ColumnSpacing = 0;
@@ -658,23 +688,15 @@ classdef vectofil_plus < matlab.apps.AppBase
             app.MadeforComputerVisionandImageProcessingcourseinZUTLabel_3 = uilabel(app.LeftPanel);
             app.MadeforComputerVisionandImageProcessingcourseinZUTLabel_3.HorizontalAlignment = 'center';
             app.MadeforComputerVisionandImageProcessingcourseinZUTLabel_3.FontSize = 10;
-            app.MadeforComputerVisionandImageProcessingcourseinZUTLabel_3.Position = [27 44 136 22];
-            app.MadeforComputerVisionandImageProcessingcourseinZUTLabel_3.Text = 'Twitter: @gkhnkcmrli';
+            app.MadeforComputerVisionandImageProcessingcourseinZUTLabel_3.Position = [21 44 290 22];
+            app.MadeforComputerVisionandImageProcessingcourseinZUTLabel_3.Text = 'Twitter: @gkhnkcmrli & LinkedIn: in/gokhankocmarli';
 
-            % Create MadeforComputerVisionandImageProcessingcourseinZUTLabel_4
-            app.MadeforComputerVisionandImageProcessingcourseinZUTLabel_4 = uilabel(app.LeftPanel);
-            app.MadeforComputerVisionandImageProcessingcourseinZUTLabel_4.HorizontalAlignment = 'center';
-            app.MadeforComputerVisionandImageProcessingcourseinZUTLabel_4.FontSize = 10;
-            app.MadeforComputerVisionandImageProcessingcourseinZUTLabel_4.Position = [183 44 138 22];
-            app.MadeforComputerVisionandImageProcessingcourseinZUTLabel_4.Text = 'LinkedIn: in/gokhankocmarli';
-
-            % Create MadeforComputerVisionandImageProcessingcourseinZUTLabel_5
-            app.MadeforComputerVisionandImageProcessingcourseinZUTLabel_5 = uilabel(app.LeftPanel);
-            app.MadeforComputerVisionandImageProcessingcourseinZUTLabel_5.HorizontalAlignment = 'right';
-            app.MadeforComputerVisionandImageProcessingcourseinZUTLabel_5.FontSize = 10;
-            app.MadeforComputerVisionandImageProcessingcourseinZUTLabel_5.FontWeight = 'bold';
-            app.MadeforComputerVisionandImageProcessingcourseinZUTLabel_5.Position = [150 44 25 22];
-            app.MadeforComputerVisionandImageProcessingcourseinZUTLabel_5.Text = '|';
+            % Create MadeforComputerVisionandImageProcessingcourseinZUTLabel_6
+            app.MadeforComputerVisionandImageProcessingcourseinZUTLabel_6 = uilabel(app.LeftPanel);
+            app.MadeforComputerVisionandImageProcessingcourseinZUTLabel_6.HorizontalAlignment = 'center';
+            app.MadeforComputerVisionandImageProcessingcourseinZUTLabel_6.FontSize = 10;
+            app.MadeforComputerVisionandImageProcessingcourseinZUTLabel_6.Position = [23 31 293 22];
+            app.MadeforComputerVisionandImageProcessingcourseinZUTLabel_6.Text = 'Icon: Hydra @ flaticon.com';
 
             % Create CenterPanel
             app.CenterPanel = uipanel(app.GridLayout);
@@ -690,7 +712,7 @@ classdef vectofil_plus < matlab.apps.AppBase
             % Create RedSpinner
             app.RedSpinner = uispinner(app.CenterPanel);
             app.RedSpinner.ValueChangingFcn = createCallbackFcn(app, @RedSpinnerValueChanging, true);
-            app.RedSpinner.Limits = [0 255];
+            app.RedSpinner.Limits = [-1 255];
             app.RedSpinner.RoundFractionalValues = 'on';
             app.RedSpinner.Enable = 'off';
             app.RedSpinner.Position = [123 359 64 22];
@@ -698,7 +720,7 @@ classdef vectofil_plus < matlab.apps.AppBase
             % Create GreenSpinner
             app.GreenSpinner = uispinner(app.CenterPanel);
             app.GreenSpinner.ValueChangingFcn = createCallbackFcn(app, @GreenSpinnerValueChanging, true);
-            app.GreenSpinner.Limits = [0 255];
+            app.GreenSpinner.Limits = [-1 255];
             app.GreenSpinner.RoundFractionalValues = 'on';
             app.GreenSpinner.Enable = 'off';
             app.GreenSpinner.Position = [188 359 64 22];
@@ -706,7 +728,7 @@ classdef vectofil_plus < matlab.apps.AppBase
             % Create BlueSpinner
             app.BlueSpinner = uispinner(app.CenterPanel);
             app.BlueSpinner.ValueChangingFcn = createCallbackFcn(app, @BlueSpinnerValueChanging, true);
-            app.BlueSpinner.Limits = [0 255];
+            app.BlueSpinner.Limits = [-1 255];
             app.BlueSpinner.RoundFractionalValues = 'on';
             app.BlueSpinner.Enable = 'off';
             app.BlueSpinner.Position = [253 359 64 22];
@@ -930,7 +952,7 @@ classdef vectofil_plus < matlab.apps.AppBase
             app.yValueLabel.Text = 'y Value of VMF';
 
             % Show the figure after all components are created
-            app.UIFigure.Visible = 'on';
+            app.VectofilUIFigure.Visible = 'on';
         end
     end
 
@@ -944,7 +966,7 @@ classdef vectofil_plus < matlab.apps.AppBase
             createComponents(app)
 
             % Register the app with App Designer
-            registerApp(app, app.UIFigure)
+            registerApp(app, app.VectofilUIFigure)
 
             % Execute the startup function
             runStartupFcn(app, @startupFcn)
@@ -958,7 +980,7 @@ classdef vectofil_plus < matlab.apps.AppBase
         function delete(app)
 
             % Delete UIFigure when app is deleted
-            delete(app.UIFigure)
+            delete(app.VectofilUIFigure)
         end
     end
 end
