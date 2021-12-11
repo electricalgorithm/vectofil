@@ -1,4 +1,4 @@
-function 3DVectorPlot(vectors, origin, ColorScheme)
+function Vector3DPlot(vectors, origin, ColorScheme)
 % 3DVectorPlot The function plots the 3D vectors in space.
 % Only and first parameter is the matrix which every column is a vector.
     

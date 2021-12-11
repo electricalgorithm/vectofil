@@ -16,13 +16,14 @@ classdef vectofil_plus < matlab.apps.AppBase
         InputImageBrowseButton     matlab.ui.control.Button
         ImageLocationTextBox       matlab.ui.control.EditField
         CenterPanel                matlab.ui.container.Panel
+        NoiseWantSwitch            matlab.ui.control.RockerSwitch
+        NoiseTypeSelector          matlab.ui.control.RockerSwitch
         NoiseText                  matlab.ui.control.Label
         NoiseLabel                 matlab.ui.control.Label
         ColorShowLamp              matlab.ui.control.Lamp
         PerformTheNoiseButton      matlab.ui.control.Button
         NoisyImageCanvas           matlab.ui.control.Image
         PercentageLabel            matlab.ui.control.Label
-        NoiseWantSwitch            matlab.ui.control.Switch
         UnderLineDesign            matlab.ui.control.Label
         NoiseAdditionLabel         matlab.ui.control.Label
         BlueLabel                  matlab.ui.control.Label
@@ -71,6 +72,7 @@ classdef vectofil_plus < matlab.apps.AppBase
         LambColorFree = [0, 1, 0];
         FilteringMethod = 'VMF';
         DDFSettings = [2, 1];
+        NoiseType = 'g';
     end
     
     methods (Access = public)
@@ -96,26 +98,33 @@ classdef vectofil_plus < matlab.apps.AppBase
                     interval(interval > 255) = 255;
                     
                     reshaped_area = reshape(app.ImageItself(index, jndex, :), [], size(app.ImageItself, 3))';
-                    
-                    % Check condition if its in interval for assign noise.
-                    if (min((interval(:, 1) < reshaped_area)) && ...
-                        min(reshaped_area < interval(:, 2)))
-                        
-                        CurrentNoiseColour = app.NoiseColour;
-                        % Checking for [-1, 0) interval in the RGB color
-                        % spinner. If a negative value given, it means that
-                        % we want it to be random.
-                        if app.NoiseColour(1) < 0
-                            CurrentNoiseColour(1) = randi([0, 255], [1, 1]);
+                     % If Gaussian selected.
+                    if lower(app.NoiseType) == 'g'
+                        app.NoisyImage = imnoise(image, 'gaussian');
+                    end
+                
+                    % If Pseudo selected.
+                    if lower(app.NoiseType) == 'p'
+                        % Check condition if its in interval for assign noise.
+                        if (min((interval(:, 1) < reshaped_area)) && ...
+                            min(reshaped_area < interval(:, 2)))
+                            
+                            CurrentNoiseColour = app.NoiseColour;
+                            % Checking for [-1, 0) interval in the RGB color
+                            % spinner. If a negative value given, it means that
+                            % we want it to be random.
+                            if app.NoiseColour(1) < 0
+                                CurrentNoiseColour(1) = randi([0, 255], [1, 1]);
+                            end
+                            if app.NoiseColour(2) < 0
+                                CurrentNoiseColour(2) = randi([0, 255], [1, 1]);
+                            end
+                            if app.NoiseColour(3) < 0
+                                CurrentNoiseColour(3) = randi([0, 255], [1, 1]);
+                            end
+                            
+                            app.NoisyImage(index, jndex, :) = CurrentNoiseColour;
                         end
-                        if app.NoiseColour(2) < 0
-                            CurrentNoiseColour(2) = randi([0, 255], [1, 1]);
-                        end
-                        if app.NoiseColour(3) < 0
-                            CurrentNoiseColour(3) = randi([0, 255], [1, 1]);
-                        end
-                        
-                        app.NoisyImage(index, jndex, :) = CurrentNoiseColour;
                     end
                 end
             end
@@ -437,10 +446,11 @@ classdef vectofil_plus < matlab.apps.AppBase
             app.FilteringStatusLamp.Color = app.LambColorFree;
         end
 
-        % Value changed function: NoiseWantSwitch
+        % Callback function
         function NoiseWantSwitchValueChanged(app, event)
             value = app.NoiseWantSwitch.Value;
             if (value == "Salt, pepper, noise!")
+                app.NoiseTypeSelector.Enable = 'on';
                 app.PercentageLabel.Enable = 'on';
                 app.NoisePercentageSlider.Enable = 'on';
                 
@@ -486,6 +496,7 @@ classdef vectofil_plus < matlab.apps.AppBase
             if min(app.NoiseColour) < 0
                 app.ColorShowLamp.Enable = "off";
             else
+                app.ColorShowLamp.Enable = "on";
                 app.ColorShowLamp.Color = app.NoiseColour./255;
             end
         end
@@ -498,6 +509,7 @@ classdef vectofil_plus < matlab.apps.AppBase
             if min(app.NoiseColour) < 0
                 app.ColorShowLamp.Enable = "off";
             else
+                app.ColorShowLamp.Enable = "on";
                 app.ColorShowLamp.Color = app.NoiseColour./255;
             end
         end
@@ -510,6 +522,7 @@ classdef vectofil_plus < matlab.apps.AppBase
             if min(app.NoiseColour) < 0
                 app.ColorShowLamp.Enable = "off";
             else
+                app.ColorShowLamp.Enable = "on";
                 app.ColorShowLamp.Color = app.NoiseColour./255;
             end
         end
@@ -599,6 +612,77 @@ classdef vectofil_plus < matlab.apps.AppBase
             changingValue = changingValue/100;
             app.DDFSettings(2) = changingValue;
             app.pValueText.Text = sprintf("%%%d", floor(app.DDFSettings(2)*100));
+        end
+
+        % Value changed function: NoiseWantSwitch
+        function NoiseWantSwitchValueChanged2(app, event)
+            value = app.NoiseWantSwitch.Value;
+            if (value == "Salt, pepper, noise!")
+                app.NoiseTypeSelector.Enable = 'on';
+                app.PerformTheNoiseButton.Enable = 'on';
+            else
+                app.NoiseTypeSelector.Enable = 'off';
+                app.PercentageLabel.Enable = 'off';
+                app.NoisePercentageSlider.Enable = 'off';
+                
+                app.ColorShowLamp.Enable = 'off';
+                app.ColourLabel.Enable = 'off';
+                app.BlueLabel.Enable = 'off';
+                app.BlueSpinner.Enable = 'off';
+                app.RedLabel.Enable = 'off';
+                app.RedSpinner.Enable = 'off';
+                app.GreenLabel.Enable = 'off';
+                app.GreenSpinner.Enable = 'off';
+                
+                app.NoiseLabel.Enable = 'off';
+                app.NoiseText.Enable = 'off';
+                
+                app.PerformTheNoiseButton.Enable = 'off';
+                
+                app.NoisyImage = app.ImageItself;
+            end
+            
+        end
+
+        % Value changed function: NoiseTypeSelector
+        function NoiseTypeSelectorValueChanged(app, event)
+            value = app.NoiseTypeSelector.Value;
+            if (value == "Pseudo Noise")
+                app.NoiseType = 'p';
+                
+                app.PercentageLabel.Enable = 'on';
+                app.NoisePercentageSlider.Enable = 'on';
+                
+                app.ColorShowLamp.Enable = 'on';
+                app.ColourLabel.Enable = 'on';
+                app.BlueLabel.Enable = 'on';
+                app.BlueSpinner.Enable = 'on';
+                app.RedLabel.Enable = 'on';
+                app.RedSpinner.Enable = 'on';
+                app.GreenLabel.Enable = 'on';
+                app.GreenSpinner.Enable = 'on';
+                
+                app.NoiseLabel.Enable = 'on';
+                app.NoiseText.Enable = 'on';
+            else
+                app.NoiseType = 'g';
+                app.PerformTheNoiseButton.Enable = 'on';
+                app.PercentageLabel.Enable = 'off';
+                app.NoisePercentageSlider.Enable = 'off';
+                
+                app.ColorShowLamp.Enable = 'off';
+                app.ColourLabel.Enable = 'off';
+                app.BlueLabel.Enable = 'off';
+                app.BlueSpinner.Enable = 'off';
+                app.RedLabel.Enable = 'off';
+                app.RedSpinner.Enable = 'off';
+                app.GreenLabel.Enable = 'off';
+                app.GreenSpinner.Enable = 'off';
+                
+                app.NoiseLabel.Enable = 'off';
+                app.NoiseText.Enable = 'off';
+            end
+            
         end
     end
 
@@ -780,14 +864,6 @@ classdef vectofil_plus < matlab.apps.AppBase
             app.UnderLineDesign.Position = [28 40 287 31];
             app.UnderLineDesign.Text = '____________________';
 
-            % Create NoiseWantSwitch
-            app.NoiseWantSwitch = uiswitch(app.CenterPanel, 'slider');
-            app.NoiseWantSwitch.Items = {'No need for nosie.', 'Salt, pepper, noise!'};
-            app.NoiseWantSwitch.ValueChangedFcn = createCallbackFcn(app, @NoiseWantSwitchValueChanged, true);
-            app.NoiseWantSwitch.Enable = 'off';
-            app.NoiseWantSwitch.Position = [148 492 45 20];
-            app.NoiseWantSwitch.Value = 'No need for nosie.';
-
             % Create PercentageLabel
             app.PercentageLabel = uilabel(app.CenterPanel);
             app.PercentageLabel.WordWrap = 'on';
@@ -827,6 +903,24 @@ classdef vectofil_plus < matlab.apps.AppBase
             app.NoiseText.Enable = 'off';
             app.NoiseText.Position = [72 304 49 22];
             app.NoiseText.Text = '%100';
+
+            % Create NoiseTypeSelector
+            app.NoiseTypeSelector = uiswitch(app.CenterPanel, 'rocker');
+            app.NoiseTypeSelector.Items = {'Pseudo Noise', 'Gaussian Noise'};
+            app.NoiseTypeSelector.Orientation = 'horizontal';
+            app.NoiseTypeSelector.ValueChangedFcn = createCallbackFcn(app, @NoiseTypeSelectorValueChanged, true);
+            app.NoiseTypeSelector.Enable = 'off';
+            app.NoiseTypeSelector.Position = [145 466 45 20];
+            app.NoiseTypeSelector.Value = 'Gaussian Noise';
+
+            % Create NoiseWantSwitch
+            app.NoiseWantSwitch = uiswitch(app.CenterPanel, 'rocker');
+            app.NoiseWantSwitch.Items = {'No need for noise.', 'Salt, pepper, noise!'};
+            app.NoiseWantSwitch.Orientation = 'horizontal';
+            app.NoiseWantSwitch.ValueChangedFcn = createCallbackFcn(app, @NoiseWantSwitchValueChanged2, true);
+            app.NoiseWantSwitch.Enable = 'off';
+            app.NoiseWantSwitch.Position = [146 492 45 20];
+            app.NoiseWantSwitch.Value = 'No need for noise.';
 
             % Create RightPanel
             app.RightPanel = uipanel(app.GridLayout);

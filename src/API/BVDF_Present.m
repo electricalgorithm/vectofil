@@ -16,8 +16,8 @@ function bvdf_present(org_image, noise_percentage, filtering_window, fill_with, 
 %       img = imopen("/home/some/location/);
 %       bvdf_present(img, 25, 3, [155, 155, 155]);
 
-    noisy_image = bvdf_add_noise(org_image, noise_percentage, size(org_image, 3), fill_with');
-    filtered_image = bvdf_filter(noisy_image, filtering_window);
+    noisy_image = AddNoise(org_image, 'p', noise_percentage, fill_with');
+    filtered_image = BasicVectorDirectionalFilter(noisy_image, filtering_window);
     
     % Checking arguments.
     if (nargin < 5) 
