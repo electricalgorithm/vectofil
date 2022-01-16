@@ -7,9 +7,9 @@ For the demonstration, check out Results directory, or [see the (older version o
 
 ### What we will add?
 
-- [ ] Save the output functionality.
+- [X] Save the output functionality.
 
-- [ ] Save the process as a PDF and PNGs functionality.
+- [X] Save the process as a PDF and PNGs functionality.
 
 - [x] Choosing the Vector Median Filtering or Basic Vector Directional Filtering process. Comperasion between two filters.
 
