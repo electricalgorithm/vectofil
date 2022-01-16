@@ -1,6 +1,8 @@
 # vectofil+
 A program to perform Basic Vector Directional Filtering for the noisy colour images. This a project of Computer Vision and Image Processing course in West Pomeranian University of Technology.
 
+![Demo Screenshot](https://raw.githubusercontent.com/electricalgorithm/vectofil/main/doc/Screenshots/SS-11122021-1.png)
+
 For the demonstration, check out Results directory, or [see the (older version of) GUI on YouTube](https://www.youtube.com/watch?v=pXBCrB0VlLY).
 
 ### What we will add?
