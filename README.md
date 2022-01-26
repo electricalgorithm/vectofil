@@ -3,7 +3,7 @@ A program to perform Basic Vector Directional Filtering for the noisy colour ima
 
 ![Demo Screenshot](https://raw.githubusercontent.com/electricalgorithm/vectofil/main/doc/Screenshots/SS-11122021-1.png)
 
-For the demonstration, check out Results directory, or [see the (older version of) GUI on YouTube](https://www.youtube.com/watch?v=pXBCrB0VlLY).
+For the demonstration, check out Results directory, or [see the GUI and working principle on YouTube](https://youtu.be/Bp7VDjBYcBw).
 
 ### What we will add?
 
